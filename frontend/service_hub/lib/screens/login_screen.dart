@@ -24,14 +24,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final authService = AuthService();
 
   Future<void> login() async {
-  if (!_formKey.currentState!.validate()) {
-    return;
-  }
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
-  try {
-    await authService.login(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
+    try {
+      await authService.login(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
     );
 
     if (!mounted) return;
