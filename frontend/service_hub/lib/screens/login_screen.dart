@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:service_hub/screens/home_screen.dart';
 
 import '../services/auth_services.dart';
 import '../widgets/custom_button.dart';
@@ -23,50 +24,52 @@ class _LoginScreenState extends State<LoginScreen> {
   final authService = AuthService();
 
   Future<void> login() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    try {
-      await authService.login(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          content: Text("Login berhasil"),
-        ),
-      );
-
-      // TODO:
-      // Navigator.pushReplacement(...)
-      // HomeScreen()
-    } on FirebaseAuthException catch (e) {
-      String message = "Login gagal";
-
-      if (e.code == "user-not-found") {
-        message = "Email tidak ditemukan";
-      }
-
-      if (e.code == "wrong-password") {
-        message = "Password salah";
-      }
-
-      if (e.code == "invalid-credential") {
-        message = "Email atau password salah";
-      }
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(backgroundColor: Colors.red, content: Text(message)),
-      );
-    }
+  if (!_formKey.currentState!.validate()) {
+    return;
   }
+
+  try {
+    await authService.login(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.green,
+        content: Text("Login berhasil"),
+      ),
+    );
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const HomeScreen(),
+      ),
+    );
+  } on FirebaseAuthException catch (e) {
+    String message = "Login gagal";
+    switch (e.code) {
+      case "user-not-found":
+        message = "Email tidak ditemukan";
+        break;
+      case "wrong-password":
+        message = "Password salah";
+        break;
+      case "invalid-credential":
+        message = "Email atau password salah";
+        break;
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.red,
+        content: Text(message),
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {

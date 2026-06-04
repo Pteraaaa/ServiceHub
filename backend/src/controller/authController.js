@@ -46,8 +46,7 @@ async (req, res) => {
     });
 
   }
-
-    };
+};
 
 const testConnection = async (req, res) => {
   try {
@@ -66,4 +65,35 @@ const testConnection = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, testConnection };
+const loginUser = async (req, res) => {
+  try {
+    const firebaseUid = req.user.uid;
+    const [rows] = await db.execute(
+      `SELECT id, firebase_uid, full_name, email, phone
+      FROM users WHERE firebase_uid = ?
+      `,
+      [firebaseUid]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      user: rows[0],
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { registerUser, testConnection, loginUser };
