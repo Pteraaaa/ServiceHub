@@ -23,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
 
   String selectedCategory = "Semua";
+  String searchQuery = "";
 
   @override
   void initState() {
@@ -47,40 +48,42 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void filterWorkshops(String category) {
+  void applyFilters() {
+    List<WorkshopModel> result = [...workshops];
+
+    if (selectedCategory == "Populer") {
+      result = result.where((w) => w.badge.toLowerCase() == "populer").toList();
+    }
+
+    if (selectedCategory == "Terdekat") {
+      result.sort((a, b) => a.distance.compareTo(b.distance));
+    }
+
+    if (searchQuery.isNotEmpty) {
+      result = result.where((w) {
+        return w.name.toLowerCase().contains(searchQuery.toLowerCase());
+      }).toList();
+    }
+
     setState(() {
-      selectedCategory = category;
-
-      switch (category) {
-        case "Terdekat":
-          filteredWorkshops = [...workshops];
-
-          filteredWorkshops.sort((a, b) => a.distance.compareTo(b.distance));
-          break;
-
-        case "Populer":
-          filteredWorkshops = workshops
-              .where((workshop) => workshop.badge.toLowerCase() == "populer")
-              .toList();
-          break;
-
-        case "Semua":
-        default:
-          filteredWorkshops = workshops;
-      }
+      filteredWorkshops = result;
     });
+  }
+
+  void searchWorkshops(String query) {
+    searchQuery = query;
+    applyFilters();
+  }
+
+  void filterWorkshops(String category) {
+    selectedCategory = category;
+    applyFilters();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF6F6F8),
-
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xffFF6B00),
-        onPressed: () {},
-        child: const Icon(Icons.add),
-      ),
 
       bottomNavigationBar: const CustomBottomNav(),
 
@@ -93,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   children: [
                     const HomeHeader(),
-                    const SearchBarWidget(),
+                    SearchBarWidget(onSearch: searchWorkshops),
                     CategoryChips(
                       selectedCategory: selectedCategory,
                       onCategorySelected: filterWorkshops,
