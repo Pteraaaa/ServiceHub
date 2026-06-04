@@ -21,17 +21,15 @@ class WorkshopModel {
     required this.services,
   });
 
-  factory WorkshopModel.fromJson(
-    Map<String, dynamic> json,
-  ) {
+  factory WorkshopModel.fromJson(Map<String, dynamic> json) {
     return WorkshopModel(
       id: json["id"],
       name: json["name"] ?? "",
       imageUrl: json["image_url"] ?? "",
       address: json["address"] ?? "",
-      distance: (json["distance"] ?? 0).toDouble(),
-      rating: (json["rating"] ?? 0).toDouble(),
-      isOpen: json["is_open"] ?? true,
+      distance: double.tryParse(json["distance"]?.toString() ?? "0") ?? 0,
+      rating: double.tryParse(json["rating"]?.toString() ?? "0") ?? 0,
+      isOpen: json["is_open"] == 1 || json["is_open"] == true,
       badge: json["badge"] ?? "",
       services: json["services"] != null
           ? List<String>.from(json["services"])

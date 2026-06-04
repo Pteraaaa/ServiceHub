@@ -2,36 +2,45 @@ const db = require("../config/tidb");
 
 const getWorkshops = async (req, res) => {
     try {
-    const [rows] = await db.execute(`
-        SELECT
-            w.id,
-            w.name,
-            w.image_url,
-            w.address,
-            w.latitude,
-            w.longitude,
-            w.rating,
-            w.is_open,
-            w.badge,
-            GROUP_CONCAT(ws.service_name) AS services
-        FROM workshops w
-        LEFT JOIN workshop_services ws
-            ON w.id = ws.workshop_id
-        GROUP BY w.id
-        ORDER BY w.rating DESC
-    `);
 
-    const workshops = rows.map((workshop) => ({
-        ...workshop,
-        services: workshop.services
-            ? workshop.services.split(",")
-            : [],
-    }));
+        const userLat = -6.200000;
+        const userLng = 106.816666;
 
-    return res.status(200).json({
-        success: true,
-        data: workshops,
-    });
+        const [rows] = await db.execute(`
+            SELECT
+                w.id,
+                w.name,
+                w.image_url,
+                w.address,
+                6371 * ACOS(
+                COS(RADIANS(?))
+                    * COS(RADIANS(w.latitude))
+                    * COS(RADIANS(w.longitude) - RADIANS(?))
+                    + SIN(RADIANS(?))
+                    * SIN(RADIANS(w.latitude))
+                ) AS distance,
+                w.rating,
+                w.is_open,
+                w.badge,
+                GROUP_CONCAT(ws.service_name) AS services
+            FROM workshops w
+            LEFT JOIN workshop_services ws
+                ON w.id = ws.workshop_id
+            GROUP BY w.id
+            ORDER BY w.rating DESC
+        `, [userLat, userLng, userLat]);
+
+        const workshops = rows.map((workshop) => ({
+            ...workshop,
+            services: workshop.services
+                ? workshop.services.split(",")
+                : [],
+        }));
+
+        return res.status(200).json({
+            success: true,
+            data: workshops,
+        });
 
     } catch (error) {
         return res.status(500).json({
