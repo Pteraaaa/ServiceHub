@@ -42,4 +42,11 @@ class AuthService {
       throw Exception("Failed to save user profile");
     }
   }
+
+  Future<void> login({required String email, required String password}) async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  }
 }

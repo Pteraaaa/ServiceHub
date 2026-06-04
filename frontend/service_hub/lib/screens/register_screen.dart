@@ -67,8 +67,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       );
 
-      // Navigate to login page
-      // Navigator.pushReplacement(...);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
     } on FirebaseAuthException catch (e) {
       String message;
 
