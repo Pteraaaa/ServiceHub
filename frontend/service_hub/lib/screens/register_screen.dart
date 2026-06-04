@@ -7,6 +7,8 @@ import '../widgets/custom_text_field.dart';
 import '../widgets/password_text_field.dart';
 import '../widgets/social_button.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -23,11 +25,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final passwordController = TextEditingController();
 
+  bool isValidEmail(String email) {
+    return RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$').hasMatch(email);
+  }
+
+  bool isValidPassword(String password) {
+    return RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{7,}$').hasMatch(password);
+  }
+
   bool agree = false;
 
   final authService = AuthService();
 
+  final _formKey = GlobalKey<FormState>();
+
   Future<void> register() async {
+    // Validate all fields first
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
     try {
       final user = UserModel(
         fullName: fullNameController.text.trim(),
@@ -42,13 +59,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Registration Success")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("Registration successful"),
+        ),
+      );
+
+      // Navigate to login page
+      // Navigator.pushReplacement(...);
+    } on FirebaseAuthException catch (e) {
+      String message;
+
+      switch (e.code) {
+        case "email-already-in-use":
+          message = "This email is already registered";
+          break;
+
+        case "invalid-email":
+          message = "Invalid email address";
+          break;
+
+        case "weak-password":
+          message = "Password is too weak";
+          break;
+
+        default:
+          message = e.message ?? "Registration failed";
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(message)),
+      );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(e.toString())),
+      );
     }
   }
 
@@ -69,100 +119,139 @@ class _RegisterScreenState extends State<RegisterScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
 
-            child: Column(
-              children: [
-                const Icon(Icons.settings, color: Color(0xFFFF6B00), size: 40),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const Icon(
+                    Icons.settings,
+                    color: Color(0xFFFF6B00),
+                    size: 40,
+                  ),
 
-                const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-                const Text(
-                  "Daftar Akun",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                ),
+                  const Text(
+                    "Daftar Akun",
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  ),
 
-                const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-                const Text(
-                  "Mulai perjalanan perawatan kendaraan Anda",
-                  textAlign: TextAlign.center,
-                ),
+                  const Text(
+                    "Mulai perjalanan perawatan kendaraan Anda",
+                    textAlign: TextAlign.center,
+                  ),
 
-                const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
-                CustomTextField(
-                  label: "Nama Lengkap",
-                  hint: "John Doe",
-                  controller: fullNameController,
-                ),
+                  CustomTextField(
+                    label: "Nama Lengkap",
+                    hint: "John Doe",
+                    controller: fullNameController,
+                  ),
 
-                const SizedBox(height: 16),
+                  const SizedBox(height: 16),
 
-                CustomTextField(
-                  label: "Email",
-                  hint: "nama@email.com",
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                ),
+                  CustomTextField(
+                    label: "Email",
+                    hint: "example@email.com",
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return "Email is required";
+                      }
 
-                const SizedBox(height: 16),
+                      final emailRegex = RegExp(
+                        r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,4}$',
+                      );
 
-                CustomTextField(
-                  label: "No. Telepon",
-                  hint: "+62 812 3456 7890",
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
-                ),
+                      if (!emailRegex.hasMatch(value.trim())) {
+                        return "Invalid email format";
+                      }
 
-                const SizedBox(height: 16),
+                      return null;
+                    },
+                  ),
 
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text("Kata Sandi"),
-                ),
+                  const SizedBox(height: 16),
 
-                const SizedBox(height: 8),
+                  CustomTextField(
+                    label: "No. Telepon",
+                    hint: "+62 812 3456 7890",
+                    controller: phoneController,
+                    keyboardType: TextInputType.phone,
+                  ),
 
-                PasswordTextField(controller: passwordController),
+                  const SizedBox(height: 16),
 
-                CheckboxListTile(
-                  value: agree,
-                  onChanged: (value) {
-                    setState(() {
-                      agree = value!;
-                    });
-                  },
-                  title: const Text("Saya menyetujui syarat & ketentuan"),
-                  contentPadding: EdgeInsets.zero,
-                ),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Kata Sandi"),
+                  ),
 
-                const SizedBox(height: 10),
+                  const SizedBox(height: 8),
 
-                CustomButton(text: "Daftar Sekarang", onPressed: register),
+                  PasswordTextField(
+                    controller: passwordController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Password is required";
+                      }
 
-                const SizedBox(height: 30),
+                      final passwordRegex = RegExp(
+                        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{7,}$',
+                      );
 
-                const Text("ATAU"),
+                      if (!passwordRegex.hasMatch(value)) {
+                        return "Must contain uppercase, lowercase, number, min 7 chars";
+                      }
 
-                const SizedBox(height: 20),
+                      return null;
+                    },
+                  ),
 
-                Row(
-                  children: [
-                    SocialButton(
-                      text: "Google",
-                      icon: Icons.g_mobiledata,
-                      onPressed: () {},
-                    ),
+                  CheckboxListTile(
+                    value: agree,
+                    onChanged: (value) {
+                      setState(() {
+                        agree = value!;
+                      });
+                    },
+                    title: const Text("Saya menyetujui syarat & ketentuan"),
+                    contentPadding: EdgeInsets.zero,
+                  ),
 
-                    const SizedBox(width: 10),
+                  const SizedBox(height: 10),
 
-                    SocialButton(
-                      text: "Facebook",
-                      icon: Icons.facebook,
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
-              ],
+                  CustomButton(text: "Daftar Sekarang", onPressed: register),
+
+                  const SizedBox(height: 30),
+
+                  const Text("ATAU"),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      SocialButton(
+                        text: "Google",
+                        icon: Icons.g_mobiledata,
+                        onPressed: () {},
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      SocialButton(
+                        text: "Facebook",
+                        icon: Icons.facebook,
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
