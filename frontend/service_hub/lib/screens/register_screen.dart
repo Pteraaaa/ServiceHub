@@ -28,13 +28,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final authService = AuthService();
 
   Future<void> register() async {
-    final user = UserModel(
-      fullName: fullNameController.text,
-      email: emailController.text,
-      phone: phoneController.text,
-    );
+    try {
+      final user = UserModel(
+        fullName: fullNameController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+      );
 
-    await authService.register(user: user, password: passwordController.text);
+      await authService.register(
+        user: user,
+        password: passwordController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Registration Success")));
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
