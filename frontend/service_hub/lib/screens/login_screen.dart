@@ -131,6 +131,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   const SizedBox(height: 16),
 
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text("Kata Sandi"),
+                  ),
+
+                  const SizedBox(height: 8),
+
                   PasswordTextField(
                     controller: passwordController,
 
