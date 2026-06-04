@@ -1,25 +1,36 @@
 const db = require("../config/tidb");
 
 const getWorkshops = async (req, res) => {
-
     try {
-
     const [rows] = await db.execute(`
         SELECT
-        id,
-        name,
-        image_url,
-        address,
-        longitude,
-        latitude,
-        rating,
-        badge 
-        FROM workshops
-        ORDER BY rating DESC
+            w.id,
+            w.name,
+            w.image_url,
+            w.address,
+            w.latitude,
+            w.longitude,
+            w.rating,
+            w.is_open,
+            w.badge,
+            GROUP_CONCAT(ws.service_name) AS services
+        FROM workshops w
+        LEFT JOIN workshop_services ws
+            ON w.id = ws.workshop_id
+        GROUP BY w.id
+        ORDER BY w.rating DESC
     `);
+
+    const workshops = rows.map((workshop) => ({
+        ...workshop,
+        services: workshop.services
+            ? workshop.services.split(",")
+            : [],
+    }));
+
     return res.status(200).json({
         success: true,
-        data: rows
+        data: workshops,
     });
 
     } catch (error) {

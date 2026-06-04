@@ -18,10 +18,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final service = WorkshopService();
-
+  final WorkshopService workshopService = WorkshopService();
   List<WorkshopModel> workshops = [];
-
+  bool isLoading = true;
+  
   @override
   void initState() {
     super.initState();

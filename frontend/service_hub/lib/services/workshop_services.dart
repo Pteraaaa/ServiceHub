@@ -1,32 +1,31 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
 import '../models/workshop_models.dart';
 
 class WorkshopService {
+
+  static const String baseUrl =
+      "http://localhost:3000/api/workshops";
+
   Future<List<WorkshopModel>> getWorkshops() async {
-    return [
-      WorkshopModel(
-        id: 1,
-        name: "AutoCare Elite Studio",
-        imageUrl:
-            "https://images.unsplash.com/photo-1487754180451-c456f719a1fc",
-        address: "Cilandak",
-        distance: 1.2,
-        isOpen: false,
-        rating: 4.9,
-        badge: "Populer",
-        services: ["Servis Berkala", "Tune Up"],
-      ),
-      WorkshopModel(
-        id: 2,
-        name: "Gloss Pro Detailing",
-        imageUrl:
-            "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-        address: "Kemang",
-        distance: 2.5,
-        isOpen: true,
-        rating: 4.8,
-        badge: "Baru",
-        services: ["Wash", "Coating"],
-      ),
-    ];
+
+    final response =
+        await http.get(Uri.parse(baseUrl));
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to load workshops");
+    }
+
+    final data = jsonDecode(response.body);
+
+    final List workshops = data["data"];
+
+    return workshops
+        .map(
+          (e) => WorkshopModel.fromJson(e),
+        )
+        .toList();
   }
 }
