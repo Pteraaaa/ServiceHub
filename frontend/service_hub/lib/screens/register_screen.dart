@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:service_hub/screens/login_screen.dart';
 
 import '../models/user_models.dart';
 import '../services/auth_services.dart';
@@ -247,6 +248,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         text: "Facebook",
                         icon: Icons.facebook,
                         onPressed: () {},
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Sudah punya akun?",
+                        style: TextStyle(color: Colors.black54),
+                      ),
+
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const LoginScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Login",
+                          style: TextStyle(
+                            color: Color(0xFFFF6B00),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ],
                   ),
