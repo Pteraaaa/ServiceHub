@@ -11,28 +11,17 @@ class SectionHeader extends StatelessWidget {
         children: [
           const Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   "Bengkel Terdekat",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 4),
-                Text(
-                  "Temukan layanan profesional di sekitar Anda",
-                )
+                Text("Temukan layanan profesional di sekitar Anda"),
               ],
             ),
           ),
-
-          TextButton(
-            onPressed: () {},
-            child: const Text("Lihat Semua"),
-          )
         ],
       ),
     );

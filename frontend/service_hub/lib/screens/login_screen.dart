@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:service_hub/screens/home_screen.dart';
+import 'package:service_hub/widgets/social_button.dart';
 
 import '../services/auth_services.dart';
 import '../widgets/custom_button.dart';
@@ -32,44 +33,39 @@ class _LoginScreenState extends State<LoginScreen> {
       await authService.login(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
-    );
+      );
 
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        backgroundColor: Colors.green,
-        content: Text("Login berhasil"),
-      ),
-    );
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const HomeScreen(),
-      ),
-    );
-  } on FirebaseAuthException catch (e) {
-    String message = "Login gagal";
-    switch (e.code) {
-      case "user-not-found":
-        message = "Email tidak ditemukan";
-        break;
-      case "wrong-password":
-        message = "Password salah";
-        break;
-      case "invalid-credential":
-        message = "Email atau password salah";
-        break;
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.green,
+          content: Text("Login berhasil"),
+        ),
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      String message = "Login gagal";
+      switch (e.code) {
+        case "user-not-found":
+          message = "Email tidak ditemukan";
+          break;
+        case "wrong-password":
+          message = "Password salah";
+          break;
+        case "invalid-credential":
+          message = "Email atau password salah";
+          break;
+      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(backgroundColor: Colors.red, content: Text(message)),
+      );
     }
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.red,
-        content: Text(message),
-      ),
-    );
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -176,20 +172,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   Row(
                     children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          child: const Text("Google"),
-                        ),
+                      SocialButton(
+                        text: "Google",
+                        icon: Icons.g_mobiledata,
+                        onPressed: () {},
                       ),
 
                       const SizedBox(width: 10),
 
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          child: const Text("Apple"),
-                        ),
+                      SocialButton(
+                        text: "Apple",
+                        icon: Icons.apple,
+                        onPressed: () {},
                       ),
                     ],
                   ),

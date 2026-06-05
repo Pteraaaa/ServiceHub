@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 
 class HomeHeader extends StatelessWidget {
-  const HomeHeader({super.key});
+  final bool showBackButton;
+
+  const HomeHeader({super.key, this.showBackButton = true});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 12,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
-          const Icon(Icons.arrow_back),
-          const SizedBox(width: 12),
+          if (showBackButton)
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back),
+            ),
+
+          if (showBackButton) const SizedBox(width: 12),
 
           const Text(
             "ServiceHub",
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
 
           const Spacer(),
@@ -29,14 +32,6 @@ class HomeHeader extends StatelessWidget {
             onPressed: () {},
             icon: const Icon(Icons.notifications_none),
           ),
-
-          const CircleAvatar(
-            backgroundColor: Color(0xff24344D),
-            child: Text(
-              "JD",
-              style: TextStyle(color: Colors.white),
-            ),
-          )
         ],
       ),
     );

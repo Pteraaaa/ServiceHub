@@ -95,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : SingleChildScrollView(
                 child: Column(
                   children: [
-                    const HomeHeader(),
+                    const HomeHeader(showBackButton: false),
                     SearchBarWidget(onSearch: searchWorkshops),
                     CategoryChips(
                       selectedCategory: selectedCategory,

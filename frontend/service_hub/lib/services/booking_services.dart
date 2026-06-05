@@ -30,7 +30,6 @@ class BookingService {
     required String notes,
   }) async {
     final token = await FirebaseAuth.instance.currentUser!.getIdToken();
-    print(token);
     await http.post(
       Uri.parse(baseUrl),
 

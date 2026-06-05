@@ -4,7 +4,6 @@ import 'package:service_hub/widgets/booking_date_picker.dart';
 import 'package:service_hub/widgets/booking_time_slots.dart';
 import 'package:service_hub/widgets/booking_workshop_card.dart';
 import 'package:service_hub/widgets/service_selection.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/workshop_models.dart';
 import '../widgets/home_header.dart';
