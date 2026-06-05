@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:service_hub/screens/booking_screen.dart';
 import '../models/workshop_models.dart';
 
 class WorkshopCard extends StatelessWidget {
   final WorkshopModel workshop;
 
-  const WorkshopCard({
-    super.key,
-    required this.workshop,
-  });
+  const WorkshopCard({super.key, required this.workshop});
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +18,8 @@ class WorkshopCard extends StatelessWidget {
 
       child: Column(
         children: [
-
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(20),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             child: Image.network(
               workshop.imageUrl,
               height: 180,
@@ -37,35 +32,26 @@ class WorkshopCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-
                 Row(
                   children: [
-
                     Expanded(
                       child: Text(
                         workshop.name,
                         style: const TextStyle(
                           fontSize: 24,
-                          fontWeight:
-                              FontWeight.bold,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
 
                     Container(
-                      padding:
-                          const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color:
-                            Colors.orange.shade50,
-                        borderRadius:
-                            BorderRadius.circular(
-                                8),
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Text(
-                        "⭐ ${workshop.rating}",
-                      ),
-                    )
+                      child: Text("⭐ ${workshop.rating}"),
+                    ),
                   ],
                 ),
 
@@ -73,13 +59,8 @@ class WorkshopCard extends StatelessWidget {
 
                 Row(
                   children: [
-                    const Icon(
-                      Icons.location_on_outlined,
-                      size: 16,
-                    ),
-                    Text(
-                      "${workshop.address}, ${workshop.distance} km",
-                    ),
+                    const Icon(Icons.location_on_outlined, size: 16),
+                    Text("${workshop.address}, ${workshop.distance} km"),
                   ],
                 ),
 
@@ -88,11 +69,7 @@ class WorkshopCard extends StatelessWidget {
                 Wrap(
                   spacing: 8,
                   children: workshop.services
-                      .map(
-                        (service) => Chip(
-                          label: Text(service),
-                        ),
-                      )
+                      .map((service) => Chip(label: Text(service)))
                       .toList(),
                 ),
 
@@ -102,18 +79,23 @@ class WorkshopCard extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(0xffFF6B00),
+                      backgroundColor: const Color(0xffFF6B00),
                     ),
-                    onPressed: () {},
-                    child: const Text(
-                      "Pesan Sekarang",
-                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              BookingScreen(workshop: workshop),
+                        ),
+                      );
+                    },
+                    child: const Text("Pesan Sekarang"),
                   ),
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

@@ -3,6 +3,7 @@ const cors = require("cors");
 
 const workshopRoutes = require("./routes/workshopRoutes");
 const authRoutes = require("../src/routes/authRoutes");
+const bookingRoutes = require("../src/routes/bookingRoutes");
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(express.json());
 
 app.use("/api/workshops", workshopRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 app.get("/", (req, res) => {
   res.json({
