@@ -49,6 +49,5 @@ class BookingWorkshopCard extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

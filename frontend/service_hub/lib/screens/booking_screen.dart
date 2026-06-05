@@ -67,16 +67,10 @@ class _BookingScreenState extends State<BookingScreen> {
 
     try {
       await bookingService.createBooking(
-        firebaseUid: FirebaseAuth.instance.currentUser!.uid,
-
         workshopId: widget.workshop.id,
-
         serviceName: selectedService!,
-
         date: selectedDate,
-
         time: selectedTime!,
-
         notes: noteController.text,
       );
 

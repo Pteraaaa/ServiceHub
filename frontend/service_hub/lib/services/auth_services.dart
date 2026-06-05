@@ -42,8 +42,8 @@ class AuthService {
       throw Exception("Failed to save user profile");
     }
   }
-  
-  Future<void> login({ required String email, required String password}) async {
+
+  Future<void> login({required String email, required String password}) async {
     final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email,
       password: password,
@@ -51,10 +51,9 @@ class AuthService {
 
     final token = await credential.user!.getIdToken();
 
-    await http.get(Uri.parse("${ApiService.baseUrl}/auth/login"),
-      headers: {
-        "Authorization": "Bearer $token",
-      },
+    await http.get(
+      Uri.parse("${ApiService.baseUrl}/api/auth/login"),
+      headers: {"Authorization": "Bearer $token"},
     );
   }
 }

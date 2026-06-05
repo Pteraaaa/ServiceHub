@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xffF6F6F8),
 
-      bottomNavigationBar: const CustomBottomNav(),
+      bottomNavigationBar: const CustomBottomNav(selectedIndex: 0),
 
       body: SafeArea(
         child: isLoading

@@ -3,8 +3,9 @@ const db = require("../config/tidb");
 const createBooking = async (req, res) => {
   try {
 
+    const firebase_uid = req.user.uid;
+
     const {
-      firebase_uid,
       workshop_id,
       service_name,
       booking_date,
@@ -12,62 +13,89 @@ const createBooking = async (req, res) => {
       notes,
     } = req.body;
 
-    const [existing] =
-      await db.execute(
-        `
-        SELECT id
-        FROM bookings
-        WHERE workshop_id = ?
-        AND booking_date = ?
-        AND booking_time = ?
-        AND status != 'Cancelled'
-        `,
-        [
-          workshop_id,
-          booking_date,
-          booking_time,
-        ]
-      );
+    const [existing] = await db.execute(
+      `
+      SELECT id
+      FROM bookings
+      WHERE workshop_id = ?
+      AND booking_date = ?
+      AND booking_time = ?
+      AND status != 'Cancelled'
+      `,
+      [
+        workshop_id,
+        booking_date,
+        booking_time,
+      ]
+    );
 
     if (existing.length > 0) {
       return res.status(400).json({
         success: false,
-        message:
-          "Time slot already booked",
+        message: "Time slot already booked",
       });
     }
 
-    const [result] =
-      await db.execute(
-        `
-        INSERT INTO bookings
-        (
-            firebase_uid,
-            workshop_id,
-            service_name,
-            booking_date,
-            booking_time,
-            notes
-        )
-        VALUES
-        (?, ?, ?, ?, ?, ?)
-        `,
-        [
-          firebase_uid,
-          workshop_id,
-          service_name,
-          booking_date,
-          booking_time,
-          notes,
-        ]
-      );
+    const [result] = await db.execute(
+      `
+      INSERT INTO bookings
+      (
+        firebase_uid,
+        workshop_id,
+        service_name,
+        booking_date,
+        booking_time,
+        notes
+      )
+      VALUES (?, ?, ?, ?, ?, ?)
+      `,
+      [
+        firebase_uid,
+        workshop_id,
+        service_name,
+        booking_date,
+        booking_time,
+        notes,
+      ]
+    );
+
+    // Demo Auto Confirmation
+    setTimeout(async () => {
+      try {
+
+        await db.execute(
+          `
+          UPDATE bookings
+          SET status = 'Confirmed'
+          WHERE id = ?
+          AND status = 'Pending'
+          `,
+          [result.insertId]
+        );
+
+        console.log(
+          `Booking ${result.insertId} automatically confirmed`
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Auto confirm error:",
+          error.message
+        );
+
+      }
+    }, 5000);
 
     return res.status(201).json({
       success: true,
       bookingId: result.insertId,
+      message: "Booking created successfully",
     });
 
   } catch (error) {
+
+    console.error(error);
 
     return res.status(500).json({
       success: false,
@@ -75,6 +103,7 @@ const createBooking = async (req, res) => {
     });
   }
 };
+
 
 const getAvailableSlots = async (req, res) => {
   try {
@@ -136,8 +165,8 @@ const getAvailableSlots = async (req, res) => {
 const getMyBookings = async (req, res) => {
   try {
 
-    const { firebaseUid } =
-      req.query;
+    const firebaseUid = req.user.uid;
+    console.log(firebaseUid);
 
     const [rows] =
       await db.execute(
@@ -205,9 +234,31 @@ const cancelBooking = async (req, res) => {
   }
 };
 
+const completeBooking = async (
+  req,
+  res
+) => {
+
+  const { id } = req.params;
+
+  await db.execute(
+    `
+    UPDATE bookings
+    SET status = 'Completed'
+    WHERE id = ?
+    `,
+    [id]
+  );
+
+  return res.json({
+    success: true,
+  });
+};
+
 module.exports = {
   createBooking,
   getMyBookings,
   getAvailableSlots,
   cancelBooking,
+  completeBooking
 };
