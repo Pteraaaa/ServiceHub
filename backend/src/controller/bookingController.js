@@ -166,7 +166,6 @@ const getMyBookings = async (req, res) => {
   try {
 
     const firebaseUid = req.user.uid;
-    console.log(firebaseUid);
 
     const [rows] =
       await db.execute(

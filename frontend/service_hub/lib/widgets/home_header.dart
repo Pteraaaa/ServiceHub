@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:service_hub/screens/home_screen.dart';
 
 class HomeHeader extends StatelessWidget {
   final bool showBackButton;
@@ -14,7 +15,10 @@ class HomeHeader extends StatelessWidget {
           if (showBackButton)
             IconButton(
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
               },
               icon: const Icon(Icons.arrow_back),
             ),
